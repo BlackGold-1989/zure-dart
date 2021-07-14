@@ -73,7 +73,7 @@ class SegmentModel {
     };
   }
 
-  void resetPosition({
+  void resetCirclePosition({
     double posX = 0.0,
     double posY = 0.0,
     int index = 0,
@@ -117,12 +117,49 @@ class SegmentModel {
     }
 
     for (var segment in sub) {
-      segment.resetPosition(
+      segment.resetCirclePosition(
         posX: this.posX,
         posY: this.posY,
         index: sub.indexOf(segment),
         size: sub.length,
         startDegree: angle,
+      );
+    }
+  }
+
+  void resetLinearPosition({
+    double posX = 0.0,
+    double posY = 0.0,
+    int index = 0,
+    @required int size,
+  }) {
+    posSX = posX;
+    posSY = posY;
+    double subWidth = (linearPadding + itemWidth) * size;
+    double subHeight = itemHeight;
+
+    this.posX = posSX - subWidth / 2 + linearPadding / 2 + itemWidth / 2 + index * (itemWidth + linearPadding);
+    this.posY = posSY + subHeight + itemHeight;
+
+    if (minPosX > this.posX) {
+      minPosX = this.posX;
+    }
+    if (minPosY > this.posY) {
+      minPosY = this.posY;
+    }
+    if (maxPosX < this.posX) {
+      maxPosX = this.posX;
+    }
+    if (maxPosY < this.posY) {
+      maxPosY = this.posY;
+    }
+
+    for (var segment in sub) {
+      segment.resetLinearPosition(
+        posX: this.posX,
+        posY: this.posY,
+        index: sub.indexOf(segment),
+        size: sub.length,
       );
     }
   }

@@ -192,3 +192,5 @@ const lineDotSpace = 2.0; //percent value
 
 const duringAnimation = 300;
 const animationStep = 15;
+
+const linearPadding = 8;

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:zure/screens/setting_screen.dart';
 import 'package:zure/screens/subs/circle_type_screen.dart';
+import 'package:zure/screens/subs/linear_type_screen.dart';
 import 'package:zure/sevices/navigator_service.dart';
 
 class MainScreen extends StatefulWidget {
@@ -11,7 +12,7 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  var isCircleType = true;
+  var isCircleType = false;
 
   @override
   void dispose() {
@@ -52,7 +53,7 @@ class _MainScreenState extends State<MainScreen> {
           ),
         ],
       ),
-      body: isCircleType? CircleTypeScreen() : Container(),
+      body: isCircleType? CircleTypeScreen() : LinearTypeScreen(),
     );
   }
 }

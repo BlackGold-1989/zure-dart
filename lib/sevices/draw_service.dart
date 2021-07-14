@@ -3,12 +3,12 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:zure/utils/constants.dart';
 
-class LineDraw extends CustomPainter {
+class LineDotDraw extends CustomPainter {
   final Offset p1;
   final Offset p2;
   final Color color;
 
-  LineDraw(
+  LineDotDraw(
     this.p1,
     this.p2, {
     this.color = Colors.black,
@@ -42,11 +42,11 @@ class LineDraw extends CustomPainter {
   }
 }
 
-class CircleDraw extends CustomPainter {
+class CircleDotDraw extends CustomPainter {
   final Offset p;
   final Color color;
 
-  CircleDraw(
+  CircleDotDraw(
     this.p, {
     this.color = Colors.black,
   });
@@ -71,6 +71,32 @@ class CircleDraw extends CustomPainter {
 
       canvas.drawLine(op1, op2, paint);
     }
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter old) {
+    return false;
+  }
+}
+
+class LineDraw extends CustomPainter {
+  final Offset p1;
+  final Offset p2;
+  final Color color;
+
+  LineDraw(
+      this.p1,
+      this.p2, {
+        this.color = Colors.black,
+      });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 1.0;
+
+    canvas.drawLine(p1, p2, paint);
   }
 
   @override

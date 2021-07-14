@@ -56,7 +56,7 @@ class _CircleTypeScreenState extends State<CircleTypeScreen> {
     }
 
     for (var segment in segments) {
-      segment.resetPosition(
+      segment.resetCirclePosition(
         size: segments.length,
         isFull: true,
         index: segments.indexOf(segment),
@@ -134,20 +134,6 @@ class _CircleTypeScreenState extends State<CircleTypeScreen> {
     }
   }
 
-  Widget getDrawLines(SegmentModel model) {
-    if (!model.isExpanded) return null;
-    if (model.sub.isEmpty) return null;
-    return Stack(
-      children: [
-        for (var item in model.sub)
-          CustomPaint(
-            painter: LineDraw(
-                Offset(model.posX, model.posY), Offset(item.posX, item.posY)),
-          ),
-      ],
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final screenX = MediaQuery.of(context).size.width / 2.0;
@@ -165,13 +151,13 @@ class _CircleTypeScreenState extends State<CircleTypeScreen> {
         child: Stack(
           children: [
             if (isShownBased)
-              MainDrawWidget(
+              MainCircleDrawWidget(
                 models: segments,
                 scale: scale,
               ),
             for (var hasSubSegment in hasSubItems)
               if (hasSubSegment.isExpanded)
-                SegmentDrawWidget(
+                SegmentCircleDrawWidget(
                   scale: scale,
                   segment: hasSubSegment,
                 ),
