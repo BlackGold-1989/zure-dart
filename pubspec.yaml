@@ -11,10 +11,10 @@ dependencies:
   flutter:
     sdk: flutter
 
-
   cupertino_icons: ^1.0.3
 
   shared_preferences: ^2.0.6
+#  custom_pop_up_menu: ^1.2.0
 
   intl: ^0.17.0
   flutter_localizations:

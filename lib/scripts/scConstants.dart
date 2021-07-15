@@ -1,4 +1,4 @@
-const jsonData1 = [
+const jData1 = [
   {
     'id' : '1',
     'title' : 'General Physic',
@@ -181,16 +181,17 @@ const jsonData1 = [
   },
 ];
 
-const circleRadius = 200.0;
-const itemDelta = 50.0;
-const itemWidth = 80.0;
-const itemHeight = 50.0;
+// You can change that values, so that you can control some project parameters like animation time, item size and stroke width.
+const cdCircleRadius = 200.0;
+const cdItemDelta = 50.0;
+const cdItemWidth = 80.0;
+const cdItemHeight = 50.0;
 
-const stroke = 2.0;
-const lineDotWidth = 3.0; //percent value
-const lineDotSpace = 2.0; //percent value
+const cdStroke = 2.0;
+const cdLineDotWidth = 3.0; //percent value
+const cdLineDotSpace = 2.0; //percent value
 
-const duringAnimation = 300;
-const animationStep = 15;
+const cdDuringAnimation = 300;
+const cdAnimationStep = 15;
 
-const linearPadding = 8;
+const cdLinearPadding = 8;

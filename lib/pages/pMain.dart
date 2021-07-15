@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:zure/screens/setting_screen.dart';
-import 'package:zure/screens/subs/circle_type_screen.dart';
-import 'package:zure/screens/subs/linear_type_screen.dart';
-import 'package:zure/sevices/navigator_service.dart';
+import 'package:zure/pages/pSetting.dart';
+import 'package:zure/pages/subs/pCircleType.dart';
+import 'package:zure/pages/subs/pLinearType.dart';
+import 'package:zure/services/svNavigator.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({Key key}) : super(key: key);
@@ -12,7 +12,8 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  var isCircleType = false;
+  // You can change this value with manual, so that you can test the different type screen mode.
+  var bCircleType = false;
 
   @override
   void dispose() {
@@ -43,8 +44,8 @@ class _MainScreenState extends State<MainScreen> {
             ),
             onPressed: () {
               NavigatorService(context).pushToWidget(
-                  screen: SettingScreen(),
-                  pop: (val) {
+                  wiScreen: SettingScreen(),
+                  fPop: (val) {
                     setState(() {
                       // _asyncData();
                     });
@@ -53,7 +54,7 @@ class _MainScreenState extends State<MainScreen> {
           ),
         ],
       ),
-      body: isCircleType? CircleTypeScreen() : LinearTypeScreen(),
+      body: bCircleType? CircleTypeScreen() : LinearTypeScreen(),
     );
   }
 }

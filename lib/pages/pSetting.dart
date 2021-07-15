@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:zure/themes/dimens.dart';
-import 'package:zure/widget/common_widget.dart';
+import 'package:zure/themes/thDimens.dart';
+import 'package:zure/components/cCommon.dart';
 
 class SettingScreen extends StatefulWidget {
   const SettingScreen({Key key}) : super(key: key);
@@ -10,15 +10,15 @@ class SettingScreen extends StatefulWidget {
 }
 
 class _SettingScreenState extends State<SettingScreen> {
-  var selectedScreen = 0;
-  var selectedData = 0;
+  var dSelectedScreen = 0;
+  var dSelectedData = 0;
 
-  var jsonScreenData = [
+  var jScreenData = [
     'Circle Theme',
     'Linear Theme',
   ];
 
-  var jsonStructureData = [
+  var jStructureData = [
     'Data 1',
     'Data 2',
   ];
@@ -37,7 +37,7 @@ class _SettingScreenState extends State<SettingScreen> {
         centerTitle: true,
       ),
       body: Container(
-        padding: EdgeInsets.symmetric(horizontal: fontBase, vertical: fontMd),
+        padding: EdgeInsets.symmetric(horizontal: tdFontBase, vertical: tdFontMd),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -49,20 +49,20 @@ class _SettingScreenState extends State<SettingScreen> {
                   fontWeight: FontWeight.w600),
             ),
             SizedBox(
-              height: offsetSm,
+              height: tdOffsetSm,
             ),
-            for (var item in jsonScreenData)
-              SettingItemWidget(
-                title: item,
-                isSelected: selectedScreen == jsonScreenData.indexOf(item),
-                action: () {
+            for (var item in jScreenData)
+              ZureSettingItemWidget(
+                sTitle: item,
+                bSelected: dSelectedScreen == jScreenData.indexOf(item),
+                fAction: () {
                   setState(() {
-                    selectedScreen = jsonScreenData.indexOf(item);
+                    dSelectedScreen = jScreenData.indexOf(item);
                   });
                 },
               ),
             SizedBox(
-              height: offsetMd,
+              height: tdOffsetMd,
             ),
             Text(
               'Select Data',
@@ -72,15 +72,15 @@ class _SettingScreenState extends State<SettingScreen> {
                   fontWeight: FontWeight.w600),
             ),
             SizedBox(
-              height: offsetSm,
+              height: tdOffsetSm,
             ),
-            for (var item in jsonStructureData)
-              SettingItemWidget(
-                title: item,
-                isSelected: selectedData == jsonStructureData.indexOf(item),
-                action: () {
+            for (var item in jStructureData)
+              ZureSettingItemWidget(
+                sTitle: item,
+                bSelected: dSelectedData == jStructureData.indexOf(item),
+                fAction: () {
                   setState(() {
-                    selectedData = jsonStructureData.indexOf(item);
+                    dSelectedData = jStructureData.indexOf(item);
                   });
                 },
               ),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:zure/screens/main_screen.dart';
+import 'package:zure/pages/pMain.dart';
 
 void main() {
   runApp(MyApp());
