@@ -49,8 +49,8 @@ class ZureMainCircleDrawWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var centerPosX = (-cpMinPosX + cdItemDelta) / dScale;
-    var centerPosY = (-cpMinPosY + cdItemDelta) / dScale;
+    var centerPosX = (lModels[0].posSX) / dScale;
+    var centerPosY = (lModels[0].posSY) / dScale;
 
     return Container(
       width: double.infinity,
@@ -60,6 +60,7 @@ class ZureMainCircleDrawWidget extends StatelessWidget {
           CustomPaint(
             painter: ZureCircleDotDraw(
               Offset(centerPosX, centerPosY),
+              dScale: dScale,
             ),
           ),
           for (var segment in lModels)
@@ -96,6 +97,7 @@ class ZureSegmentCircleDrawWidget extends StatelessWidget {
             painter: ZureCircleDotDraw(
               Offset(seModel.posX / dScale, seModel.posY / dScale),
               cColor: seModel.color.toColor(),
+              dScale: dScale,
             ),
           ),
           for (var seg in seModel.sub)

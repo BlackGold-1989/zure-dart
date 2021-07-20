@@ -45,10 +45,12 @@ class ZureLineDotDraw extends CustomPainter {
 class ZureCircleDotDraw extends CustomPainter {
   final Offset oPosition;
   final Color cColor;
+  final double dScale;
 
   ZureCircleDotDraw(
     this.oPosition, {
     this.cColor = Colors.black,
+    this.dScale,
   });
 
   @override
@@ -58,7 +60,7 @@ class ZureCircleDotDraw extends CustomPainter {
       ..strokeWidth = 0.5;
 
     double stepDegree = 2 * pi / (628 / (cdLineDotWidth + cdLineDotSpace));
-    double radius = cdCircleRadius - cdItemDelta;
+    double radius = cdCircleRadius / dScale;
     for (var i = 0; i < 628 / (cdLineDotWidth + cdLineDotSpace); i++) {
       double startDegree = i * stepDegree;
       double endDegree = startDegree +
@@ -85,10 +87,10 @@ class ZureLineDraw extends CustomPainter {
   final Color cColor;
 
   ZureLineDraw(
-      this.oP1,
-      this.oP2, {
-        this.cColor = Colors.black,
-      });
+    this.oP1,
+    this.oP2, {
+    this.cColor = Colors.black,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {

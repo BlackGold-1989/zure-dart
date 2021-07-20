@@ -30,6 +30,9 @@ class _CircleTypeScreenState extends State<CircleTypeScreen> {
   Offset oOriginTarget = Offset.zero;
   Offset oTarget = Offset.zero;
 
+  var oStartDrag = Offset.zero;
+  var oEndedDrag = Offset.zero;
+
   @override
   void dispose() {
     controller.dispose();
@@ -47,6 +50,12 @@ class _CircleTypeScreenState extends State<CircleTypeScreen> {
 
   void _asyncData() {
     dScale = 1.0;
+    bShownBased = false;
+
+    cpMinPosX = 0.0;
+    cpMinPosY = 0.0;
+    cpMaxPosX = 0.0;
+    cpMaxPosY = 0.0;
 
     lSegments.clear();
     for (var json in jData1) {
@@ -68,37 +77,71 @@ class _CircleTypeScreenState extends State<CircleTypeScreen> {
       getAllItems(segment);
     }
 
-    cpMaxPosX = cpMaxPosX - cpMinPosX + 110.0;
-    cpMaxPosY = cpMaxPosY - cpMinPosY + 90.0;
+    cpMinPosX = cpMinPosX - cdItemDelta;
+    cpMinPosY = cpMinPosY - cdItemDelta;
+    cpMaxPosX = cpMaxPosX + cdItemDelta;
+    cpMaxPosY = cpMaxPosY + cdItemDelta;
 
-    var scaleX = cpMaxPosX / MediaQuery.of(context).size.width;
-    var scaleY = cpMaxPosY / MediaQuery.of(context).size.height;
+    var dPanelWidth = cpMaxPosX - cpMinPosX;
+    var dPanelHeight = cpMaxPosY - cpMinPosY;
+
+    var dRealWidth = MediaQuery.of(context).size.width;
+    var dRealHeight = MediaQuery.of(context).size.height -
+        AppBar().preferredSize.height -
+        MediaQuery.of(context).padding.top -
+        MediaQuery.of(context).padding.bottom;
+
+    var scaleX = dPanelWidth / dRealWidth;
+    var scaleY = dPanelHeight / dRealHeight;
 
     dScale = max(scaleX, scaleY);
 
-    print('[ALL] segment count: ${lAllItems.length}');
+    cpWidth = dScale * dRealWidth;
+    cpHeight = dScale * dRealHeight;
+
+    Offset oCenter = Offset(cpWidth / 2.0 - (cpMaxPosX + cpMinPosX) / 2.0,
+        cpHeight / 2.0 - (cpMaxPosY + cpMinPosX) / 2.0);
+
     for (var segment in lAllItems) {
-      segment.zureOffSet(cpMinPosX, cpMinPosY);
+      segment.zureOffSet(-oCenter.dx, -oCenter.dy);
       if (segment.sub.isNotEmpty) {
         lHasSubItems.add(segment);
       }
     }
 
-    oOriginTarget = Offset(-cpMinPosX + cdItemDelta, -cpMinPosX + cdItemDelta);
-    setControllerScale((-cpMinPosX + cdItemDelta), (-cpMinPosX + cdItemDelta));
+    oOriginTarget = Offset(lSegments[0].posSX, lSegments[0].posSY);
+
+    final screenCenterX = MediaQuery.of(context).size.width / 2.0;
+    final screenCenterY = (MediaQuery.of(context).size.height -
+            AppBar().preferredSize.height -
+            MediaQuery.of(context).padding.top -
+            MediaQuery.of(context).padding.bottom) /
+        2.0;
+
+    setControllerScale(
+        lSegments[0].posSX - screenCenterX, lSegments[0].posSY - screenCenterY);
   }
 
   void setAnimationScale() {
+    final screenCenterX = MediaQuery.of(context).size.width / 2.0;
+    final screenCenterY = (MediaQuery.of(context).size.height -
+            AppBar().preferredSize.height -
+            MediaQuery.of(context).padding.top -
+            MediaQuery.of(context).padding.bottom) /
+        2.0;
+
     if (dStep > 0) {
       dStep = dStep - 1;
 
       Offset delta = oTarget - oOriginTarget;
       Offset centerOffset =
           oTarget - delta * dStep.toDouble() / cdAnimationStep.toDouble();
-      setControllerScale(centerOffset.dx, centerOffset.dy);
+      setControllerScale(
+          (centerOffset.dx - screenCenterX), (centerOffset.dy - screenCenterY));
       Timer(Duration(milliseconds: 300 ~/ cdAnimationStep),
           () => setAnimationScale());
     } else {
+      print('[Offset] oOriginTarget: $oOriginTarget');
       Timer(Duration(milliseconds: 100), () {
         dStep = cdAnimationStep;
         oOriginTarget = oTarget;
@@ -107,20 +150,8 @@ class _CircleTypeScreenState extends State<CircleTypeScreen> {
   }
 
   void setControllerScale(double centerX, double centerY) {
-    final screenX = MediaQuery.of(context).size.width / 2.0;
-    final screenY = (MediaQuery.of(context).size.height -
-            AppBar().preferredSize.height -
-            MediaQuery.of(context).padding.top -
-            MediaQuery.of(context).padding.bottom) /
-        2.0;
-
-    final w = max(0.0, centerX - screenX);
-    final h = max(0.0, centerY - screenY);
-
-    print('[OFFSET] values: [$w , $h]');
-
     final initialTransform =
-        Transform.translate(offset: Offset(-w, -h)).transform;
+        Transform.translate(offset: Offset(-centerX, -centerY)).transform;
     controller =
         TransformationController(initialTransform.clone()..scale(dScale));
     setState(() {});
@@ -142,85 +173,136 @@ class _CircleTypeScreenState extends State<CircleTypeScreen> {
             MediaQuery.of(context).padding.bottom) /
         2.0;
 
-    return SafeArea(
-      child: InteractiveViewer(
-        maxScale: dScale,
-        transformationController: controller,
-        scaleEnabled: false,
-        child: Stack(
-          children: [
-            if (bShownBased)
-              ZureMainCircleDrawWidget(
-                lModels: lSegments,
-                dScale: dScale,
-              ),
-            for (var hasSubSegment in lHasSubItems)
-              if (hasSubSegment.isExpanded)
-                ZureSegmentCircleDrawWidget(
-                  dScale: dScale,
-                  seModel: hasSubSegment,
-                ),
-            for (var i = 0; i < lAllItems.length; i++)
-              lAllItems[lAllItems.length - 1 - i].zureCircleWidget(dScale, fAction: () {
-                setState(() {
-                  lAllItems[lAllItems.length - 1 - i].zureSetChangeExpanded(
-                      !lAllItems[lAllItems.length - 1 - i].isExpanded);
-                  if (lAllItems[lAllItems.length - 1 - i].isExpanded) {
-                    List<ZureSegmentModel> friendSegments =
-                        ZureSegmentModel.zureGetFriendSegment(
-                            lAllItems[lAllItems.length - 1 - i], lAllItems);
-                    print('[Friends] length: ${friendSegments.length}');
-                    if (friendSegments.isEmpty) {
-                      friendSegments = lSegments;
-                    }
-                    for (var item in friendSegments) {
-                      if (item.id == lAllItems[lAllItems.length - 1 - i].id) {
-                        continue;
-                      }
-                      item.zureSetChangeExpanded(false);
-                    }
-                    oTarget = Offset(
-                        max(screenX, lAllItems[lAllItems.length - 1 - i].posX),
-                        max(screenY, lAllItems[lAllItems.length - 1 - i].posY));
-                    setAnimationScale();
-                  }
-                });
-              }),
-            Positioned(
-              top: (-cpMinPosY + cdItemDelta - cdItemHeight / 2.0) / dScale,
-              left: (-cpMinPosX + cdItemDelta - cdItemWidth / 2.0) / dScale,
-              child: InkWell(
-                onTap: () {
-                  bShownBased = !bShownBased;
-                  for (var segment in lSegments) {
-                    segment.zureSetChangeVisible(bShownBased);
-                  }
-                  oTarget = Offset(max(screenX, (-cpMinPosX + cdItemDelta)),
-                      max(screenY, (-cpMinPosX + cdItemDelta)));
-                  setAnimationScale();
-                },
-                child: Container(
-                  width: cdItemWidth / dScale,
-                  height: cdItemHeight / dScale,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border.all(color: Colors.black, width: 0.5),
-                    borderRadius: BorderRadius.all(
-                        Radius.circular(cdItemHeight / 3.0 / dScale)),
+    return Stack(
+      children: [
+        SafeArea(
+          child: InteractiveViewer(
+            maxScale: dScale * 2,
+            minScale: dScale,
+            onInteractionStart: (detail) {
+              oStartDrag =
+              controller.toScene(Offset.zero);
+              print('[Offset] Start Offset: $oStartDrag');
+            },
+            onInteractionUpdate: (detail) {
+              print('[Scale] Drag Scale: ${detail.scale}');
+            },
+            onInteractionEnd: (detail) {
+              oEndedDrag =
+                  controller.toScene(Offset.zero);
+              print('[Offset] Start Offset: $oEndedDrag');
+              print('[Offset] Delta Offset: ${oStartDrag - oEndedDrag}');
+              oOriginTarget = oOriginTarget - (oStartDrag - oEndedDrag) * dScale;
+            },
+            transformationController: controller,
+            scaleEnabled: true,
+            child: Stack(
+              children: [
+                if (bShownBased)
+                  ZureMainCircleDrawWidget(
+                    lModels: lSegments,
+                    dScale: dScale,
                   ),
-                  child: Center(
-                    child: Text(
-                      'PHYSICS',
-                      style: TextStyle(
-                          fontSize: tdFontNormal - dScale, color: Colors.black),
+                for (var hasSubSegment in lHasSubItems)
+                  if (hasSubSegment.isExpanded)
+                    ZureSegmentCircleDrawWidget(
+                      dScale: dScale,
+                      seModel: hasSubSegment,
+                    ),
+                for (var i = 0; i < lAllItems.length; i++)
+                  lAllItems[lAllItems.length - 1 - i].zureCircleWidget(dScale,
+                      fAction: () {
+                    setState(() {
+                      lAllItems[lAllItems.length - 1 - i].zureSetChangeExpanded(
+                          !lAllItems[lAllItems.length - 1 - i].isExpanded);
+                      if (lAllItems[lAllItems.length - 1 - i].isExpanded) {
+                        List<ZureSegmentModel> friendSegments =
+                            ZureSegmentModel.zureGetFriendSegment(
+                                lAllItems[lAllItems.length - 1 - i], lAllItems);
+                        print('[Friends] length: ${friendSegments.length}');
+                        if (friendSegments.isEmpty) {
+                          friendSegments = lSegments;
+                        }
+                        for (var item in friendSegments) {
+                          if (item.id ==
+                              lAllItems[lAllItems.length - 1 - i].id) {
+                            continue;
+                          }
+                          item.zureSetChangeExpanded(false);
+                        }
+                      }
+                      var posX = lAllItems[lAllItems.length - 1 - i].posX;
+                      if (posX + cdItemDelta < screenX) {
+                        posX = screenX;
+                      }
+                      if (posX + cdItemDelta > cpWidth - screenX) {
+                        posX = cpWidth - screenX;
+                      }
+                      var posY = lAllItems[lAllItems.length - 1 - i].posY;
+                      if (posY + cdItemDelta < screenY) {
+                        posY = screenY;
+                      }
+                      if (posY + cdItemDelta > cpHeight - screenY) {
+                        posY = cpHeight - screenY;
+                      }
+                      oTarget = Offset(posX, posY);
+                      setAnimationScale();
+                    });
+                  }),
+                if (lSegments.isNotEmpty)
+                  Positioned(
+                    left: (lSegments[0].posSX - cdItemWidth / 2.0) / dScale,
+                    top: (lSegments[0].posSY - cdItemHeight / 2.0) / dScale,
+                    child: InkWell(
+                      onTap: () {
+                        bShownBased = !bShownBased;
+                        for (var segment in lSegments) {
+                          segment.zureSetChangeVisible(bShownBased);
+                        }
+                        oTarget =
+                            Offset(lSegments[0].posSX, lSegments[0].posSY);
+                        setAnimationScale();
+                      },
+                      child: Container(
+                        width: cdItemWidth / dScale,
+                        height: cdItemHeight / dScale,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          border: Border.all(color: Colors.black, width: 0.5),
+                          borderRadius: BorderRadius.all(
+                              Radius.circular(cdItemHeight / 3.0 / dScale)),
+                        ),
+                        child: Center(
+                          child: Text(
+                            'PHYSICS',
+                            style: TextStyle(
+                                fontSize: tdFontNormal - dScale,
+                                color: Colors.black),
+                          ),
+                        ),
+                      ),
                     ),
                   ),
-                ),
-              ),
+              ],
             ),
-          ],
+          ),
         ),
-      ),
+        Positioned(
+          right: cdItemDelta / 2.0,
+          top: cdItemDelta / 2.0,
+          child: IconButton(
+            onPressed: () {
+              setState(() {
+                _asyncData();
+              });
+            },
+            icon: Icon(
+              Icons.refresh,
+              color: Colors.black,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

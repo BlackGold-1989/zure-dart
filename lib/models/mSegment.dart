@@ -28,7 +28,7 @@ class ZureSegmentModel {
     this.sub,
   });
 
-  // That function is used like override funtion, but not override function. So that I recomment to not change for that function name.
+  // That function is used like override function, but not override function. So that I recommend to not change for that function name.
   factory ZureSegmentModel.fromMap(Map<String, dynamic> map) {
     var jsonArray = map['sub'];
     List<ZureSegmentModel> models = [];
@@ -44,7 +44,7 @@ class ZureSegmentModel {
     );
   }
 
-  // That function is used like override funtion, but not override function. So that I recomment to not change for that function name.
+  // That function is used like override function, but not override function. So that I recommend to not change for that function name.
   Map<String, dynamic> toMap() {
     var jsonArray = [];
     for (var segment in sub) {
@@ -64,7 +64,7 @@ class ZureSegmentModel {
     };
   }
 
-  // That function is used like override funtion, but not override function. So that I recomment to not change for that function name.
+  // That function is used like override function, but not override function. So that I recommend to not change for that function name.
   Map<String, dynamic> toDataMap() {
     return {
       'id': this.id,
@@ -170,10 +170,10 @@ class ZureSegmentModel {
   }
 
   void zureOffSet(double x, double y) {
-    posX = posX - x + cdItemDelta;
-    posY = posY - y + cdItemDelta;
-    posSX = posSX - x + cdItemDelta;
-    posSY = posSY - y + cdItemDelta;
+    posX = posX - x;
+    posY = posY - y;
+    posSX = posSX - x;
+    posSY = posSY - y;
   }
 
   void zureSetChangeVisible(bool flag) {

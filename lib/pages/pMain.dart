@@ -13,7 +13,7 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   // You can change this value with manual, so that you can test the different type screen mode.
-  var bCircleType = false;
+  var bCircleType = true;
 
   @override
   void dispose() {
@@ -47,7 +47,7 @@ class _MainScreenState extends State<MainScreen> {
                   wiScreen: SettingScreen(),
                   fPop: (val) {
                     setState(() {
-                      // _asyncData();
+                      // bCircleType = !bCircleType;
                     });
                   });
             },
