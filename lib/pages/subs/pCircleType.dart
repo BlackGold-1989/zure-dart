@@ -90,12 +90,6 @@ class _CircleTypeScreenState extends State<CircleTypeScreen> {
         AppBar().preferredSize.height -
         MediaQuery.of(context).padding.top -
         MediaQuery.of(context).padding.bottom;
-    // if (dRealWidth > dRealHeight) {
-    //   dRealHeight = dRealHeight + (
-    //   AppBar().preferredSize.height +
-    //       MediaQuery.of(context).padding.top +
-    //       MediaQuery.of(context).padding.bottom);
-    // }
 
     var scaleX = dPanelWidth / dRealWidth;
     var scaleY = dPanelHeight / dRealHeight;
@@ -197,9 +191,6 @@ class _CircleTypeScreenState extends State<CircleTypeScreen> {
                 oStartDrag = controller.toScene(Offset.zero);
                 print('[Offset] Start Offset: $oStartDrag');
               },
-              // onInteractionUpdate: (detail) {
-              //   print('[Scale] Drag Scale: ${detail.scale}');
-              // },
               onInteractionEnd: (detail) {
                 oEndedDrag = controller.toScene(Offset.zero);
                 print('[Offset] Start Offset: $oEndedDrag');

@@ -139,14 +139,14 @@ class ZureMainLinearDrawWidget extends StatelessWidget {
       child: Stack(
         children: [
           CustomPaint(
-            painter: ZureLineDraw(
+            painter: ZureLineDotDraw(
               Offset(centerPosX, centerPosY),
               Offset(centerPosX, centerPosY + cdItemHeight / dScale),
               cColor: cColor,
             ),
           ),
           CustomPaint(
-            painter: ZureLineDraw(
+            painter: ZureLineDotDraw(
               Offset(centerPosX - subWidth / 2, centerPosY + cdItemHeight / dScale),
               Offset(centerPosX + subWidth / 2, centerPosY + cdItemHeight / dScale),
               cColor: cColor,
@@ -154,7 +154,7 @@ class ZureMainLinearDrawWidget extends StatelessWidget {
           ),
           for (var segment in lModels)
             CustomPaint(
-              painter: ZureLineDraw(
+              painter: ZureLineDotDraw(
                 Offset((segment.posX) / dScale, (segment.posY - cdItemHeight) / dScale),
                 Offset((segment.posX) / dScale, (segment.posY) / dScale),
                 cColor: cColor,

@@ -21,9 +21,11 @@ class ZureLineDotDraw extends CustomPainter {
       ..strokeWidth = cdStroke;
 
     Offset deltaP = oP2 - oP1;
-    double stepX = deltaP.dx / (100 / (cdLineDotWidth + cdLineDotSpace));
-    double stepY = deltaP.dy / (100 / (cdLineDotWidth + cdLineDotSpace));
-    for (var i = 0; i < 100 / (cdLineDotWidth + cdLineDotSpace); i++) {
+    double dLength = deltaP.distance;
+    double count = dLength / (cdLineDotWidth + cdLineDotSpace);
+    double stepX = deltaP.dx / count;
+    double stepY = deltaP.dy / count;
+    for (var i = 0; i < count - 0.5; i++) {
       Offset op1 = Offset(oP1.dx + stepX * i, oP1.dy + stepY * i);
       Offset op2 = Offset(
           oP1.dx +

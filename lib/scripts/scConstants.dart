@@ -187,7 +187,7 @@ const cdItemDelta = 50.0;
 const cdItemWidth = 80.0;
 const cdItemHeight = 50.0;
 
-const cdStroke = 2.0;
+const cdStroke = 1.0;
 const cdLineDotWidth = 3.0; //percent value
 const cdLineDotSpace = 2.0; //percent value
 
