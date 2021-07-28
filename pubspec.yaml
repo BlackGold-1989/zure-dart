@@ -15,6 +15,7 @@ dependencies:
 
   shared_preferences: ^2.0.6
 #  custom_pop_up_menu: ^1.2.0
+  auto_size_text: ^3.0.0-nullsafety.0
 
   intl: ^0.17.0
   flutter_localizations:

@@ -238,7 +238,7 @@ class ZureSegmentModel {
               child: Text(
                 title,
                 style: TextStyle(
-                    fontSize: tdFontNormal - dScale,
+                    fontSize: tdFontNormal,
                     color: Colors.white),
                 textAlign: TextAlign.center,
               ),
