@@ -12,4 +12,6 @@ const double tdFontMd = 18.0;
 const double tdFontBase = 16.0;
 const double tdFontSm = 14.0;
 const double tdFontXSm = 12.0;
+
+// This is a text font size, If you need you can change that value.
 const double tdFontNormal = 6.0;

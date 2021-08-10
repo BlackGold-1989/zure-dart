@@ -13,7 +13,7 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   // You can change this value with manual, so that you can test the different type screen mode.
-  var bCircleType = true;
+  var bCircleType = false;
 
   @override
   void dispose() {

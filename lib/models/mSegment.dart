@@ -222,25 +222,28 @@ class ZureSegmentModel {
       child: AnimatedOpacity(
         duration: Duration(milliseconds: isShow? cdDuringAnimation : 0),
         opacity: isShow? 1: 0,
-        child: InkWell(
-          onTap: () => isShow? fAction() : null,
-          child: Container(
-            width: cdItemWidth / dScale,
-            height: cdItemHeight / dScale,
-            padding: EdgeInsets.all(2.0),
-            decoration: BoxDecoration(
-              color: color.toColor(),
-              border: Border.all(color: Colors.black, width: 0.5),
-              borderRadius: BorderRadius.all(
-                  Radius.circular(cdItemHeight / 3.0 / dScale)),
-            ),
-            child: Center(
-              child: Text(
-                title,
-                style: TextStyle(
-                    fontSize: tdFontNormal,
-                    color: Colors.white),
-                textAlign: TextAlign.center,
+        child: Visibility(
+          visible: isShow,
+          child: InkWell(
+            onTap: () => isShow? fAction() : null,
+            child: Container(
+              width: cdItemWidth / dScale,
+              height: cdItemHeight / dScale,
+              padding: EdgeInsets.all(2.0),
+              decoration: BoxDecoration(
+                color: color.toColor(),
+                border: Border.all(color: Colors.black, width: 0.5),
+                borderRadius: BorderRadius.all(
+                    Radius.circular(cdItemHeight / 3.0 / dScale)),
+              ),
+              child: Center(
+                child: Text(
+                  title,
+                  style: TextStyle(
+                      fontSize: tdFontNormal,
+                      color: Colors.white),
+                  textAlign: TextAlign.center,
+                ),
               ),
             ),
           ),
@@ -256,25 +259,28 @@ class ZureSegmentModel {
       child: AnimatedOpacity(
         duration: Duration(milliseconds: isShow? cdDuringAnimation : 0),
         opacity: isShow? 1: 0,
-        child: InkWell(
-          onTap: () => isShow? fAction() : null,
-          child: Container(
-            width: cdItemWidth / dScale,
-            height: cdItemHeight / dScale,
-            padding: EdgeInsets.all(2.0),
-            decoration: BoxDecoration(
-              color: color.toColor(),
-              border: Border.all(color: Colors.black, width: 0.5),
-              borderRadius: BorderRadius.all(
-                  Radius.circular(cdItemHeight / 3.0 / dScale)),
-            ),
-            child: Center(
-              child: Text(
-                title,
-                style: TextStyle(
-                    fontSize: tdFontNormal - dScale,
-                    color: Colors.white),
-                textAlign: TextAlign.center,
+        child: Visibility(
+          visible: isShow,
+          child: InkWell(
+            onTap: () => isShow? fAction() : null,
+            child: Container(
+              width: cdItemWidth / dScale,
+              height: cdItemHeight / dScale,
+              padding: EdgeInsets.all(2.0),
+              decoration: BoxDecoration(
+                color: color.toColor(),
+                border: Border.all(color: Colors.black, width: 0.5),
+                borderRadius: BorderRadius.all(
+                    Radius.circular(cdItemHeight / 3.0 / dScale)),
+              ),
+              child: Center(
+                child: Text(
+                  title,
+                  style: TextStyle(
+                      fontSize: tdFontNormal,
+                      color: Colors.white),
+                  textAlign: TextAlign.center,
+                ),
               ),
             ),
           ),

@@ -98,10 +98,6 @@ class _CircleTypeScreenState extends State<CircleTypeScreen> {
     cpWidth = dScale * dRealWidth;
     cpHeight = dScale * dRealHeight;
 
-    print('[Size] real: ${Offset(dRealWidth, dRealHeight)}');
-    print('[Size] calc: ${Offset(cpWidth, cpHeight)}');
-    print('[Scale] value: $dScale');
-
     Offset oCenter = Offset((cpWidth - dPanelWidth) / 2.0 - cpMinPosX,
         (cpHeight - dPanelHeight) / 2.0 - cpMinPosY);
 
@@ -128,7 +124,6 @@ class _CircleTypeScreenState extends State<CircleTypeScreen> {
       Timer(Duration(milliseconds: 300 ~/ cdAnimationStep),
           () => setAnimationScale());
     } else {
-      print('[Offset] oOriginTarget: $oOriginTarget');
       Timer(Duration(milliseconds: 100), () {
         dStep = cdAnimationStep;
         oOriginTarget = oTarget;
@@ -142,7 +137,6 @@ class _CircleTypeScreenState extends State<CircleTypeScreen> {
     controller =
         TransformationController(initialTransform.clone()..scale(dShowScale));
 
-    print('[Controller] value: ${controller.value}');
     setState(() {});
   }
 
@@ -154,14 +148,10 @@ class _CircleTypeScreenState extends State<CircleTypeScreen> {
   }
 
   void setControllerParams() {
-    print('----------------------------------------');
     dShowScale = double.parse(controller.value.row0.toString().split(',')[0]);
     var dOffsetX = double.parse(controller.value.row0.toString().split(',')[3]);
     var dOffsetY = double.parse(controller.value.row1.toString().split(',')[3]);
     oOriginTarget = Offset(dOffsetX, dOffsetY);
-    print('[Scale] value: $dShowScale');
-    print('[Controller] value: ${controller.value}');
-    print('----------------------------------------');
   }
 
   @override
