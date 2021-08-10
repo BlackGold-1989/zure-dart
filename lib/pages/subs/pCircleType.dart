@@ -31,9 +31,6 @@ class _CircleTypeScreenState extends State<CircleTypeScreen> {
   Offset oOriginTarget = Offset.zero;
   Offset oTarget = Offset.zero;
 
-  var oStartDrag = Offset.zero;
-  var oEndedDrag = Offset.zero;
-
   @override
   void dispose() {
     controller.dispose();
@@ -115,29 +112,19 @@ class _CircleTypeScreenState extends State<CircleTypeScreen> {
       }
     }
 
-    oOriginTarget = Offset(lSegments[0].posSX, lSegments[0].posSY);
-
-    setControllerScale(lSegments[0].posSX - dRealWidth / 2.0,
-        lSegments[0].posSY - dRealHeight / 2.0,
-        dScale: dScale);
+    oOriginTarget = Offset(-lSegments[0].posSX, -lSegments[0].posSY) +
+        Offset(dRealWidth / 2.0, dRealHeight / 2.0);
+    setControllerScale(oOriginTarget.dx, oOriginTarget.dy);
   }
 
   void setAnimationScale() {
-    final screenCenterX = MediaQuery.of(context).size.width / 2.0;
-    final screenCenterY = (MediaQuery.of(context).size.height -
-            AppBar().preferredSize.height -
-            MediaQuery.of(context).padding.top -
-            MediaQuery.of(context).padding.bottom) /
-        2.0;
-
     if (dStep > 0) {
       dStep = dStep - 1;
 
-      Offset delta = oTarget - oOriginTarget;
+      Offset delta = (oTarget - oOriginTarget);
       Offset centerOffset =
           oTarget - delta * dStep.toDouble() / cdAnimationStep.toDouble();
-      setControllerScale(
-          (centerOffset.dx - screenCenterX), (centerOffset.dy - screenCenterY));
+      setControllerScale((centerOffset.dx), (centerOffset.dy));
       Timer(Duration(milliseconds: 300 ~/ cdAnimationStep),
           () => setAnimationScale());
     } else {
@@ -149,18 +136,13 @@ class _CircleTypeScreenState extends State<CircleTypeScreen> {
     }
   }
 
-  void setControllerScale(double centerX, double centerY, {double dScale}) {
+  void setControllerScale(double dx, double dy) {
     final initialTransform =
-        Transform.translate(offset: Offset(-centerX, -centerY)).transform;
-    if (dScale != null) {
-      controller =
-          TransformationController(initialTransform.clone()..scale(dScale));
-    } else {
-      controller =
-          TransformationController(initialTransform.clone()..scale(dShowScale));
-    }
+        Transform.translate(offset: Offset(dx, dy)).transform;
+    controller =
+        TransformationController(initialTransform.clone()..scale(dShowScale));
 
-    print('[Controller] value: ${controller.toString()}');
+    print('[Controller] value: ${controller.value}');
     setState(() {});
   }
 
@@ -169,6 +151,17 @@ class _CircleTypeScreenState extends State<CircleTypeScreen> {
     for (var subSegment in segmentModel.sub) {
       getAllItems(subSegment);
     }
+  }
+
+  void setControllerParams() {
+    print('----------------------------------------');
+    dShowScale = double.parse(controller.value.row0.toString().split(',')[0]);
+    var dOffsetX = double.parse(controller.value.row0.toString().split(',')[3]);
+    var dOffsetY = double.parse(controller.value.row1.toString().split(',')[3]);
+    oOriginTarget = Offset(dOffsetX, dOffsetY);
+    print('[Scale] value: $dShowScale');
+    print('[Controller] value: ${controller.value}');
+    print('----------------------------------------');
   }
 
   @override
@@ -197,20 +190,7 @@ class _CircleTypeScreenState extends State<CircleTypeScreen> {
             child: InteractiveViewer(
               maxScale: dScale * 2,
               minScale: dScale,
-              onInteractionStart: (detail) {
-                oStartDrag = controller.toScene(Offset.zero);
-                print('[Offset] Start Offset: $oStartDrag');
-              },
-              onInteractionEnd: (detail) {
-                oEndedDrag = controller.toScene(Offset.zero);
-                print('[Offset] Start Offset: $oEndedDrag');
-                print('[Offset] Delta Offset: ${oStartDrag - oEndedDrag}');
-                // dShowScale = double.parse(
-                //     controller.value.row0.toString().split(',')[0]);
-                oOriginTarget =
-                    oOriginTarget - (oStartDrag - oEndedDrag) * dShowScale;
-                print('[Controller] value: ${controller.value}');
-              },
+              onInteractionEnd: (detail) => setControllerParams(),
               transformationController: controller,
               scaleEnabled: true,
               child: Stack(
@@ -218,17 +198,17 @@ class _CircleTypeScreenState extends State<CircleTypeScreen> {
                   if (bShownBased)
                     ZureMainCircleDrawWidget(
                       lModels: lSegments,
-                      dScale: dShowScale,
+                      dScale: dScale,
                     ),
                   for (var hasSubSegment in lHasSubItems)
                     if (hasSubSegment.isExpanded)
                       ZureSegmentCircleDrawWidget(
-                        dScale: dShowScale,
+                        dScale: dScale,
                         seModel: hasSubSegment,
                       ),
                   for (var i = 0; i < lAllItems.length; i++)
                     lAllItems[lAllItems.length - 1 - i].zureCircleWidget(
-                      dShowScale,
+                      dScale,
                       fAction: () {
                         setState(
                           () {
@@ -255,21 +235,31 @@ class _CircleTypeScreenState extends State<CircleTypeScreen> {
                                 item.zureSetChangeExpanded(false);
                               }
                             }
-                            var posX = lAllItems[lAllItems.length - 1 - i].posX;
+                            cpWidth = dShowScale * screenX * 2;
+                            cpHeight = dShowScale * screenY * 2;
+                            var posX =
+                                lAllItems[lAllItems.length - 1 - i].posX /
+                                    dScale *
+                                    dShowScale;
                             if (posX + cdItemDelta < screenX) {
                               posX = screenX;
                             }
                             if (posX + cdItemDelta > cpWidth - screenX) {
                               posX = cpWidth - screenX;
                             }
-                            var posY = lAllItems[lAllItems.length - 1 - i].posY;
+                            var posY =
+                                lAllItems[lAllItems.length - 1 - i].posY /
+                                    dScale *
+                                    dShowScale;
                             if (posY + cdItemDelta < screenY) {
                               posY = screenY;
                             }
                             if (posY + cdItemDelta > cpHeight - screenY) {
                               posY = cpHeight - screenY;
                             }
-                            oTarget = Offset(posX, posY);
+                            oTarget =
+                                Offset(-posX, -posY) + Offset(screenX, screenY);
+                            setControllerParams();
                             setAnimationScale();
                           },
                         );
@@ -277,10 +267,8 @@ class _CircleTypeScreenState extends State<CircleTypeScreen> {
                     ),
                   if (lSegments.isNotEmpty)
                     Positioned(
-                      left:
-                          (lSegments[0].posSX - cdItemWidth / 2.0) / dShowScale,
-                      top: (lSegments[0].posSY - cdItemHeight / 2.0) /
-                          dShowScale,
+                      left: (lSegments[0].posSX - cdItemWidth / 2.0) / dScale,
+                      top: (lSegments[0].posSY - cdItemHeight / 2.0) / dScale,
                       child: InkWell(
                         onTap: () {
                           bShownBased = !bShownBased;
@@ -288,17 +276,21 @@ class _CircleTypeScreenState extends State<CircleTypeScreen> {
                             segment.zureSetChangeVisible(bShownBased);
                           }
                           oTarget =
-                              Offset(lSegments[0].posSX, lSegments[0].posSY);
+                              Offset(-lSegments[0].posSX, -lSegments[0].posSY) /
+                                      dScale *
+                                      dShowScale +
+                                  Offset(screenX, screenY);
+                          setControllerParams();
                           setAnimationScale();
                         },
                         child: Container(
-                          width: cdItemWidth / dShowScale,
-                          height: cdItemHeight / dShowScale,
+                          width: cdItemWidth / dScale,
+                          height: cdItemHeight / dScale,
                           decoration: BoxDecoration(
                             color: Colors.white,
                             border: Border.all(color: Colors.black, width: 0.5),
-                            borderRadius: BorderRadius.all(Radius.circular(
-                                cdItemHeight / 3.0 / dShowScale)),
+                            borderRadius: BorderRadius.all(
+                                Radius.circular(cdItemHeight / 3.0 / dScale)),
                           ),
                           child: Center(
                             child: Text(

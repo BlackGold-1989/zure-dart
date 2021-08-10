@@ -24,15 +24,13 @@ class _LinearTypeScreenState extends State<LinearTypeScreen> {
   var bShownBased = false;
 
   var dScale = 1.0;
+  var dShowScale = 1.0;
 
   var controller = TransformationController();
 
   var dStep = cdAnimationStep;
   Offset oOriginTarget = Offset.zero;
   Offset oTarget = Offset.zero;
-
-  var oStartDrag = Offset.zero;
-  var oEndedDrag = Offset.zero;
 
   @override
   void initState() {
@@ -64,17 +62,17 @@ class _LinearTypeScreenState extends State<LinearTypeScreen> {
       lSegments.add(segment);
     }
 
-    lAllItems.clear();
-    lHasSubItems.clear();
-    for (var segment in lSegments) {
-      getAllItems(segment);
-    }
-
     for (var segment in lSegments) {
       segment.zureResetLinearPosition(
         dSize: lSegments.length,
         dIndex: lSegments.indexOf(segment),
       );
+    }
+
+    lAllItems.clear();
+    lHasSubItems.clear();
+    for (var segment in lSegments) {
+      getAllItems(segment);
     }
 
     cpMinPosX = cpMinPosX - cdItemDelta;
@@ -95,6 +93,7 @@ class _LinearTypeScreenState extends State<LinearTypeScreen> {
     var scaleY = dPanelHeight / dRealHeight;
 
     dScale = max(scaleX, scaleY);
+    dShowScale = dScale;
 
     cpWidth = dScale * dRealWidth;
     cpHeight = dScale * dRealHeight;
@@ -113,30 +112,21 @@ class _LinearTypeScreenState extends State<LinearTypeScreen> {
       }
     }
 
-    oOriginTarget = Offset(lSegments[0].posSX, lSegments[0].posSY);
-
-    setControllerScale(lSegments[0].posSX - dRealWidth / 2.0,
-        lSegments[0].posSY - dRealHeight / 2.0);
+    oOriginTarget = Offset(-lSegments[0].posSX, -lSegments[0].posSY) +
+        Offset(dRealWidth / 2.0, dRealHeight / 2.0);
+    setControllerScale(oOriginTarget.dx, oOriginTarget.dy);
   }
 
   void setAnimationScale() {
-    final screenCenterX = MediaQuery.of(context).size.width / 2.0;
-    final screenCenterY = (MediaQuery.of(context).size.height -
-            AppBar().preferredSize.height -
-            MediaQuery.of(context).padding.top -
-            MediaQuery.of(context).padding.bottom) /
-        2.0;
-
     if (dStep > 0) {
       dStep = dStep - 1;
 
-      Offset delta = oTarget - oOriginTarget;
+      Offset delta = (oTarget - oOriginTarget);
       Offset centerOffset =
           oTarget - delta * dStep.toDouble() / cdAnimationStep.toDouble();
-      setControllerScale(
-          (centerOffset.dx - screenCenterX), (centerOffset.dy - screenCenterY));
+      setControllerScale((centerOffset.dx), (centerOffset.dy));
       Timer(Duration(milliseconds: 300 ~/ cdAnimationStep),
-          () => setAnimationScale());
+              () => setAnimationScale());
     } else {
       print('[Offset] oOriginTarget: $oOriginTarget');
       Timer(Duration(milliseconds: 100), () {
@@ -146,11 +136,13 @@ class _LinearTypeScreenState extends State<LinearTypeScreen> {
     }
   }
 
-  void setControllerScale(double centerX, double centerY) {
+  void setControllerScale(double dx, double dy) {
     final initialTransform =
-        Transform.translate(offset: Offset(-centerX, -centerY)).transform;
+        Transform.translate(offset: Offset(dx, dy)).transform;
     controller =
-        TransformationController(initialTransform.clone()..scale(dScale));
+        TransformationController(initialTransform.clone()..scale(dShowScale));
+
+    print('[Controller] value: ${controller.value}');
     setState(() {});
   }
 
@@ -159,6 +151,17 @@ class _LinearTypeScreenState extends State<LinearTypeScreen> {
     for (var subSegment in segmentModel.sub) {
       getAllItems(subSegment);
     }
+  }
+
+  void setControllerParams() {
+    print('----------------------------------------');
+    dShowScale = double.parse(controller.value.row0.toString().split(',')[0]);
+    var dOffsetX = double.parse(controller.value.row0.toString().split(',')[3]);
+    var dOffsetY = double.parse(controller.value.row1.toString().split(',')[3]);
+    oOriginTarget = Offset(dOffsetX, dOffsetY);
+    print('[Scale] value: $dShowScale');
+    print('[Controller] value: ${controller.value}');
+    print('----------------------------------------');
   }
 
   @override
@@ -176,17 +179,7 @@ class _LinearTypeScreenState extends State<LinearTypeScreen> {
           child: InteractiveViewer(
             maxScale: dScale * 2,
             minScale: dScale,
-            onInteractionStart: (detail) {
-              oStartDrag = controller.toScene(Offset.zero);
-              print('[Offset] Start Offset: $oStartDrag');
-            },
-            onInteractionEnd: (detail) {
-              oEndedDrag = controller.toScene(Offset.zero);
-              print('[Offset] Start Offset: $oEndedDrag');
-              print('[Offset] Delta Offset: ${oStartDrag - oEndedDrag}');
-              oOriginTarget =
-                  oOriginTarget - (oStartDrag - oEndedDrag) * dScale;
-            },
+            onInteractionEnd: (detail) => setControllerParams(),
             transformationController: controller,
             scaleEnabled: true,
             child: Stack(
@@ -207,45 +200,59 @@ class _LinearTypeScreenState extends State<LinearTypeScreen> {
                   lAllItems[lAllItems.length - 1 - i].zureLinearWidget(
                     dScale,
                     fAction: () {
-                      setState(() {
-                        lAllItems[lAllItems.length - 1 - i]
-                            .zureSetChangeExpanded(
-                                !lAllItems[lAllItems.length - 1 - i]
-                                    .isExpanded);
-                        if (lAllItems[lAllItems.length - 1 - i].isExpanded) {
-                          List<ZureSegmentModel> friendSegments =
-                              ZureSegmentModel.zureGetFriendSegment(
-                                  lAllItems[lAllItems.length - 1 - i],
-                                  lAllItems);
-                          print('[Friends] length: ${friendSegments.length}');
-                          if (friendSegments.isEmpty) {
-                            friendSegments = lSegments;
-                          }
-                          for (var item in friendSegments) {
-                            if (item.id ==
-                                lAllItems[lAllItems.length - 1 - i].id) {
-                              continue;
+                      setState(
+                            () {
+                          lAllItems[lAllItems.length - 1 - i]
+                              .zureSetChangeExpanded(
+                              !lAllItems[lAllItems.length - 1 - i]
+                                  .isExpanded);
+                          if (lAllItems[lAllItems.length - 1 - i]
+                              .isExpanded) {
+                            List<ZureSegmentModel> friendSegments =
+                            ZureSegmentModel.zureGetFriendSegment(
+                                lAllItems[lAllItems.length - 1 - i],
+                                lAllItems);
+                            print(
+                                '[Friends] length: ${friendSegments.length}');
+                            if (friendSegments.isEmpty) {
+                              friendSegments = lSegments;
                             }
-                            item.zureSetChangeExpanded(false);
+                            for (var item in friendSegments) {
+                              if (item.id ==
+                                  lAllItems[lAllItems.length - 1 - i].id) {
+                                continue;
+                              }
+                              item.zureSetChangeExpanded(false);
+                            }
                           }
-                        }
-                        var posX = lAllItems[lAllItems.length - 1 - i].posX;
-                        if (posX + cdItemDelta < screenX) {
-                          posX = screenX;
-                        }
-                        if (posX + cdItemDelta > cpWidth - screenX) {
-                          posX = cpWidth - screenX;
-                        }
-                        var posY = lAllItems[lAllItems.length - 1 - i].posY;
-                        if (posY + cdItemDelta < screenY) {
-                          posY = screenY;
-                        }
-                        if (posY + cdItemDelta > cpHeight - screenY) {
-                          posY = cpHeight - screenY;
-                        }
-                        oTarget = Offset(posX, posY);
-                        setAnimationScale();
-                      });
+                          cpWidth = dShowScale * screenX * 2;
+                          cpHeight = dShowScale * screenY * 2;
+                          var posX =
+                              lAllItems[lAllItems.length - 1 - i].posX /
+                                  dScale *
+                                  dShowScale;
+                          if (posX + cdItemDelta < screenX) {
+                            posX = screenX;
+                          }
+                          if (posX + cdItemDelta > cpWidth - screenX) {
+                            posX = cpWidth - screenX;
+                          }
+                          var posY =
+                              lAllItems[lAllItems.length - 1 - i].posY /
+                                  dScale *
+                                  dShowScale;
+                          if (posY + cdItemDelta < screenY) {
+                            posY = screenY;
+                          }
+                          if (posY + cdItemDelta > cpHeight - screenY) {
+                            posY = cpHeight - screenY;
+                          }
+                          oTarget =
+                              Offset(-posX, -posY) + Offset(screenX, screenY);
+                          setControllerParams();
+                          setAnimationScale();
+                        },
+                      );
                     },
                   ),
                 if (lSegments.isNotEmpty)
@@ -258,8 +265,12 @@ class _LinearTypeScreenState extends State<LinearTypeScreen> {
                         for (var segment in lSegments) {
                           segment.zureSetChangeVisible(bShownBased);
                         }
-                        oTarget = Offset(max(screenX, (lSegments[0].posSX)),
-                            max(screenY, (lSegments[0].posSY)));
+                        oTarget =
+                            Offset(-lSegments[0].posSX, -lSegments[0].posSY) /
+                                dScale *
+                                dShowScale +
+                                Offset(screenX, screenY);
+                        setControllerParams();
                         setAnimationScale();
                       },
                       child: Container(
