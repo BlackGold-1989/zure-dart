@@ -1,6 +1,6 @@
 # zure
 
-A new Flutter project.
+This A new Flutter project.
 
 ## Getting Started
 
